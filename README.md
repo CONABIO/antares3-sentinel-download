@@ -5,7 +5,7 @@
 To obtain Sentinel images, you can consult them through the `dhusget.sh` script. For example, all the images available for Mexico between 2018-01-01 and 2018-08-01 could be searched as shown below:
 
 
-```bash dhusget.sh -d https://scihub.copernicus.eu/dhus -u <user> -p <passwd> -m Sentinel-2 -S 2018-01-01T00:00:00.000Z -E 2018-08-01T23:00:00.000Z -T S2MSI1C -c -117.12,14.53:-86.81,32.7 -q```
+```bash dhusget.sh -d https://scihub.copernicus.eu/dhus -u madmex -p madmex... -S 2018-01-01T00:00:00.000Z -E 2018-08-01T23:00:00.000Z -c -117.12,14.53:-86.81,32.7 -F 'platformname:Sentinel-2 AND producttype:S2MSI1C AND orbitdirection:DESCENDING' -q```
 
 
 Where `<user>` and `<passwd>` are the credential for access in [Copernicus Open Access Hub](https://scihub.copernicus.eu/dhus/#/home). The rest of the parameters are to limit the search for a specific mission, in our case Sentinel-2, the initial and final dates in which the scene was taken, the type of product and finally the coordinates of opposite vertices of the bounding box of the region of interest, in our example Mexico. The `-q` parameter means that the result of the query will be saved in a xml file. For more details on the use of the script consult the following [link](https://scihub.copernicus.eu/userguide/BatchScripting). If you need help to determine the bounding box of a particular region, you can consult the following [page](https://boundingbox.klokantech.com/).
@@ -13,10 +13,10 @@ Where `<user>` and `<passwd>` are the credential for access in [Copernicus Open 
 As a result of the search, all the available scenes for that period of time and region will be found in the OSquery-result.xml file, as shown below:
 
 ```
-2018-09-04 11:43:35 (200 KB/s) - 'OSquery-result.xml' saved [75444]
+2018-09-04 13:31:40 (196 KB/s) - 'OSquery-result.xml' saved [75647]
 
 
-     1	Displaying 0 to 24 of 41979 total results. Request done in 0.126 seconds.
+     1	Displaying 0 to 24 of 41828 total results. Request done in 0.084 seconds.
 
      1	https://scihub.copernicus.eu/dhus/odata/v1/Products('2109b973-b52c-42c0-9cfb-e7f4a0d913c3')
      1	S2A_MSIL1C_20180801T181011_N0206_R084_T12SUA_20180801T234550
@@ -70,3 +70,13 @@ As a result of the search, all the available scenes for that period of time and 
     25	S2A_MSIL1C_20180801T181011_N0206_R084_T11RQQ_20180801T234550
 the end
 ```
+
+
+
+
+
+
+
+
+
+
