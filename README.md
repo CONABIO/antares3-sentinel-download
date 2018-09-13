@@ -109,14 +109,39 @@ export DHUS_URL="https://scihub.copernicus.eu/dhus"
 ```
 Therefore, an alternative command line would be:
 
+.. code-block:: bash
+sentinelsat -g oaxaca.geojson -s 20180801 -e 20180810 --producttype S2MSI1C -q "orbitdirection=Descending" --footprints --cloud 5 --sentinel 2
+
+
+The download now is done with Sentinelhub with its download tool from AWS. To do that, we'll use a python script to read the `search_footprints.geojson` file to get the product name. 
+
+.. code-block:: python
+
+import json
+
+with open('search_footprints.geojson') as f:
+    data = json.load(f)
+
+for feature in data['features']:
+    print (feature['properties']['identifier'])
+
+
+
+In our case, with the following output:
 ```
-sentinelsat -g oaxaca_simple.geojson -s 20180801 -e 20180810 --producttype S2MSI1C -q "orbitdirection=Descending" --footprints --cloud 5 --sentinel 2
+S2B_MSIL1C_20180809T163829_N0206_R126_T15PUT_20180809T221152
+S2B_MSIL1C_20180809T163829_N0206_R126_T15PTT_20180809T221152
+S2B_MSIL1C_20180809T163829_N0206_R126_T15PVT_20180809T221152
+S2A_MSIL1C_20180807T164901_N0206_R026_T14PPC_20180807T203921
+S2A_MSIL1C_20180807T164901_N0206_R026_T14QNF_20180807T203921
+S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T221143
 ```
 
+In order to process the scenes downloaded with sen2cor, we must download the images in a .SAFE format as shown below:
 
+.. code-block:: bash
 
-
-
+sentinelhub.aws --product S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T221143 -f ~/s2_downloads
 
 
 
