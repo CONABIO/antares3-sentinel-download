@@ -6,9 +6,94 @@ For now, the Sentinel-2 scene download process is not integrated into the MAD-Me
 
 Before starting, it is mandatory to have an account in AWS and Copernicus Open Access Hub, it is assumed that you have such libraries installed in a UNIX environment, for more details on the installation and configuration of Sentinelat and Sentinelhub you can review the documentation [here](https://sentinelsat.readthedocs.io/en/stable/) and [here](https://sentinelhub-py.readthedocs.io/en/latest/configure.html) respectively.
 
-The approach we show below is to search the available scenes for a region using the Sentinelsat search engine.
+The approach we show below is to search the available scenes for a region using the Sentinelsat search engine. Here is an example of use for the region of Oaxaca, Mexico for a specific period of time. The `--footprints` flag means that you do not download the found scenes but write the results to a file called `search_footprints.geojson`.
 
 ```sentinelsat -u <user> -p <passwd> -g oaxaca.geojson -s 20180801 -e 20180810 --producttype S2MSI1C -q "orbitdirection=Descending" --url "https://scihub.copernicus.eu/dhus" --footprints --cloud 5 --sentinel 2```
+
+With the following output:
+
+```I1C -q "orbitdirection=Descending" --url "https://scihub.copernicus.eu/dhus" --footprints --cloud 5 --sentinel 2
+Found 6 products
+Product 86734389-979e-4655-b081-89c07e8429e0 - Date: 2018-08-09T16:38:29.024Z, Instrument: MSI, Mode: , Satellite: Sentinel-2, Size: 749.11 MB
+Product aa8662c7-78d5-49ba-b1a2-7e86f168b844 - Date: 2018-08-09T16:38:29.024Z, Instrument: MSI, Mode: , Satellite: Sentinel-2, Size: 699.30 MB
+Product d2f77768-9e19-4e8b-9d15-7998fa83a82c - Date: 2018-08-09T16:38:29.024Z, Instrument: MSI, Mode: , Satellite: Sentinel-2, Size: 402.28 MB
+Product aedab398-aaa7-4369-ab82-c21824dcdd3c - Date: 2018-08-07T16:49:01.024Z, Instrument: MSI, Mode: , Satellite: Sentinel-2, Size: 734.11 MB
+Product eae1b4f2-1c61-4dc2-a121-4f9e00be5256 - Date: 2018-08-07T16:49:01.024Z, Instrument: MSI, Mode: , Satellite: Sentinel-2, Size: 210.16 MB
+Product e06d305a-5355-4a8a-bd68-24fa61cb37f4 - Date: 2018-08-05T17:00:09.024Z, Instrument: MSI, Mode: , Satellite: Sentinel-2, Size: 23.55 MB
+---
+6 scenes found with a total size of 2.75 GB```
+
+It is very important to mention that the file of the search region must be a polygon as simple as possible, a very complex polygon and with many points can cause an error in the command. For the previous example, this is the search file for the Oaxaca region:
+
+```{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -98.69018554687499,
+              16.29905101458183
+            ],
+            [
+              -98.272705078125,
+              15.971891580928983
+            ],
+            [
+              -96.416015625,
+              15.464269084198357
+            ],
+            [
+              -94.998779296875,
+              16.024695711685315
+            ],
+            [
+              -93.8232421875,
+              15.866241564066629
+            ],
+            [
+              -93.658447265625,
+              17.24574420800713
+            ],
+            [
+              -94.46044921875,
+              17.308687886770034
+            ],
+            [
+              -95.262451171875,
+              17.8846591795428
+            ],
+            [
+              -96.536865234375,
+              18.771115062337024
+            ],
+            [
+              -97.591552734375,
+              18.562947442888312
+            ],
+            [
+              -98.734130859375,
+              17.78007412664325
+            ],
+            [
+              -98.32763671875,
+              16.951724234434437
+            ],
+            [
+              -98.69018554687499,
+              16.29905101458183
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}```
+
 
 
 
