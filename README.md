@@ -8,7 +8,7 @@ Before starting, it is mandatory to have an account in AWS and Copernicus Open A
 
 The approach we show below is to search the available scenes for a region using the Sentinelsat search engine. Here is an example of use for the region of Oaxaca, Mexico for a specific period of time. The `--footprints` flag means that you do not download the found scenes but write the results to a file called `search_footprints.geojson`.
 
-```
+```bash
 sentinelsat -u <user> -p <passwd> -g oaxaca.geojson -s 20180801 -e 20180810 --producttype S2MSI1C -q "orbitdirection=Descending" --url "https://scihub.copernicus.eu/dhus" --footprints --cloud 5 --sentinel 2
 ```
 
@@ -109,14 +109,14 @@ export DHUS_URL="https://scihub.copernicus.eu/dhus"
 ```
 Therefore, an alternative command line would be:
 
-```
+```bash
 sentinelsat -g oaxaca.geojson -s 20180801 -e 20180810 --producttype S2MSI1C -q "orbitdirection=Descending" --footprints --cloud 5 --sentinel 2
 ```
 
 The download now is done with Sentinelhub with its download tool from AWS. To do that, we'll use a python script to read the `search_footprints.geojson` file to get the product name. 
 
 
-```
+```python
 import json
 
 with open('search_footprints.geojson') as f:
@@ -139,7 +139,7 @@ S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T221143
 
 In order to process the scenes downloaded with sen2cor, we must download the images in a .SAFE format as shown below:
 
-```
+```bash
 sentinelhub.aws --product S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T221143 -f ~/s2_downloads
 ``` 
 The `~/s2_downloads` folder must be created previously. 
@@ -149,13 +149,13 @@ The `~/s2_downloads` folder must be created previously.
 
 There is an important aspect to keep in mind, the scenes downloaded with Sentinelhub come from the S3 bucket `sentinel-s2-l1c`, therefore the `.SAFE` format is only being emulated by the download tool. Once the download has finished, we can proceed to run `sen2cor` as follows:
 
-```
+```bash
 L2A_Process ~/s2_downloads/S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T221143.SAFE
 ```
 
 The above command is possible if the following alias is previously defined in the `~/.bashrc` file:
 
-```
+```bash
 alias L2A_Process='/home/<user>/Sen2Cor-02.05.05-Linux64/bin/L2A_Process'
 ```
 The complete path depends on the folder of installation defined for sen2cor.
