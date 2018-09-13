@@ -106,7 +106,13 @@ It is possible to configure environment variables for the user and password in s
 export DHUS_USER="<user>"
 export DHUS_PASSWORD="<password>"
 export DHUS_URL="https://scihub.copernicus.eu/dhus"
-``
+```
+Therefore, an alternative command line would be:
+
+```
+sentinelsat -g oaxaca_simple.geojson -s 20180801 -e 20180810 --producttype S2MSI1C -q "orbitdirection=Descending" --footprints --cloud 5 --sentinel 2
+```
+
 
 
 
