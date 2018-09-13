@@ -27,7 +27,7 @@ Product e06d305a-5355-4a8a-bd68-24fa61cb37f4 - Date: 2018-08-05T17:00:09.024Z, I
 6 scenes found with a total size of 2.75 GB
 ```
 
-It is very important to mention that the file of the search region must be a polygon as simple as possible, a very complex polygon and with many points can cause an error in the command. For the previous example, this is the search file for the Oaxaca region:
+It is very important to mention that the file of the search region must be a polygon as simple as possible, a very complex polygon with many points can cause an error in the command. For the previous example, this is the search file for the Oaxaca region:
 
 ```
 {
