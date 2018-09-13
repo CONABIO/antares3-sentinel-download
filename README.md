@@ -160,7 +160,10 @@ alias L2A_Process='/home/<user>/Sen2Cor-02.05.05-Linux64/bin/L2A_Process'
 ```
 The complete path depends on the folder of installation defined for sen2cor.
 
+# Note
 
+
+There is a preconfigured AMI for MAD-Mex called `sentinel2_download_preproc` with all the libraries and configurations needed to reproduce this example.
 
 
 
