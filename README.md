@@ -4,7 +4,7 @@
 
 For now, the Sentinel-2 scene download process is not integrated into the MAD-Mex system. The download process is described below using the [sentinelsat](https://github.com/sentinelsat/sentinelsat) and [sentinelhub](https://github.com/sentinel-hub/sentinelhub-py) libraries.
 
-Before starting, it is mandatory to have an account in AWS and Copernicus Open Access Hub, it is assumed that you have such libraries installed in a UNIX environment, for more details on the installation and configuration of Sentinelat and Sentinelhub you can review the documentation [here](https://sentinelsat.readthedocs.io/en/stable/) and [here](https://sentinelhub-py.readthedocs.io/en/latest/configure.html) respectively.
+Before starting, it is mandatory to have an account in AWS and Copernicus Open Access Hub, it is assumed that you have such libraries installed in a UNIX environment as well as the [sen2cor](http://step.esa.int/main/third-party-plugins-2/sen2cor/) tool, for more details on the installation and configuration of Sentinelat and Sentinelhub you can review the documentation [here](https://sentinelsat.readthedocs.io/en/stable/) and [here](https://sentinelhub-py.readthedocs.io/en/latest/configure.html) respectively.
 
 The approach we show below is to search the available scenes for a region using the Sentinelsat search engine. Here is an example of use for the region of Oaxaca, Mexico for a specific period of time. The `--footprints` flag means that you do not download the found scenes but write the results to a file called `search_footprints.geojson`.
 
@@ -142,7 +142,27 @@ In order to process the scenes downloaded with sen2cor, we must download the ima
 ```
 sentinelhub.aws --product S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T221143 -f ~/s2_downloads
 ``` 
-The `~/s2_downloads` must be created previously. 
+The `~/s2_downloads` folder must be created previously. 
+
+There is an important aspect to keep in mind, the scenes downloaded with Sentinelhub come from the S3 bucket `sentinel-s2-l1c`, therefore the `.SAFE` format is only being emulated by the download tool. Once the download has finished, we can proceed to run `sen2cor` as follows:
+
+```
+L2A_Process S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T221143.SAFE
+```
+
+The above command is possible if the following alias is previously defined in the `~/.bashrc` file:
+
+```
+alias L2A_Process='/home/<user>/Sen2Cor-02.05.05-Linux64/bin/L2A_Process'
+```
+The complete path depends on the folder of installation defined for sen2cor.
+
+
+
+
+
+
+
 
 
 
