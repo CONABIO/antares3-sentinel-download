@@ -29,76 +29,9 @@ Product e06d305a-5355-4a8a-bd68-24fa61cb37f4 - Date: 2018-08-05T17:00:09.024Z, I
 
 It is very important to mention that the file of the search region must be a polygon as simple as possible, a very complex polygon with many points can cause an error in the command. For the previous example, this is the search file for the Oaxaca region:
 
-```
-{
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              -98.69018554687499,
-              16.29905101458183
-            ],
-            [
-              -98.272705078125,
-              15.971891580928983
-            ],
-            [
-              -96.416015625,
-              15.464269084198357
-            ],
-            [
-              -94.998779296875,
-              16.024695711685315
-            ],
-            [
-              -93.8232421875,
-              15.866241564066629
-            ],
-            [
-              -93.658447265625,
-              17.24574420800713
-            ],
-            [
-              -94.46044921875,
-              17.308687886770034
-            ],
-            [
-              -95.262451171875,
-              17.8846591795428
-            ],
-            [
-              -96.536865234375,
-              18.771115062337024
-            ],
-            [
-              -97.591552734375,
-              18.562947442888312
-            ],
-            [
-              -98.734130859375,
-              17.78007412664325
-            ],
-            [
-              -98.32763671875,
-              16.951724234434437
-            ],
-            [
-              -98.69018554687499,
-              16.29905101458183
-            ]
-          ]
-        ]
-      }
-    }
-  ]
-}
-```
+
+<script src="https://gist.github.com/robmartz/f488fde09f262d8db5a87e2cd5f538c7.js"></script>
+
 It is possible to configure environment variables for the user and password in sentinelsat and avoid entering them in the command line. Simply write the following lines in the `~/.bashrc` file
 
 
