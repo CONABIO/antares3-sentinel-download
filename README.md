@@ -144,6 +144,9 @@ sentinelhub.aws --product S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T
 ``` 
 The `~/s2_downloads` folder must be created previously. 
 
+
+# Running sen2cor
+
 There is an important aspect to keep in mind, the scenes downloaded with Sentinelhub come from the S3 bucket `sentinel-s2-l1c`, therefore the `.SAFE` format is only being emulated by the download tool. Once the download has finished, we can proceed to run `sen2cor` as follows:
 
 ```
