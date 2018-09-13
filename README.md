@@ -150,7 +150,7 @@ The `~/s2_downloads` folder must be created previously.
 There is an important aspect to keep in mind, the scenes downloaded with Sentinelhub come from the S3 bucket `sentinel-s2-l1c`, therefore the `.SAFE` format is only being emulated by the download tool. Once the download has finished, we can proceed to run `sen2cor` as follows:
 
 ```
-L2A_Process S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T221143.SAFE
+L2A_Process ~/s2_downloads/S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T221143.SAFE
 ```
 
 The above command is possible if the following alias is previously defined in the `~/.bashrc` file:
