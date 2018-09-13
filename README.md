@@ -27,8 +27,7 @@ Product e06d305a-5355-4a8a-bd68-24fa61cb37f4 - Date: 2018-08-05T17:00:09.024Z, I
 6 scenes found with a total size of 2.75 GB
 ```
 
-It is very important to mention that the file of the search region must be a polygon as simple as possible, a very complex polygon with many points can cause an error in the command. For the previous example, this is the search file for the Oaxaca [region](https://gist.github.com/robmartz/f488fde09f262d8db5a87e2cd5f538c7).
-
+It is very important to mention that the file of the search region must be a polygon as simple as possible, a very complex polygon with many points can cause an error in the command. For the previous example, [here](https://gist.github.com/robmartz/f488fde09f262d8db5a87e2cd5f538c7) is the `geojson` file for Oaxaca. To create new geojson you can consult the following [link](https://google-developers.appspot.com/maps/documentation/utils/geojson/).
 
 
 It is possible to configure environment variables for the user and password in sentinelsat and avoid entering them in the command line. Simply write the following lines in the `~/.bashrc` file
