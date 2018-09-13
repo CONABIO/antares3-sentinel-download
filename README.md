@@ -99,7 +99,14 @@ It is very important to mention that the file of the search region must be a pol
   ]
 }
 ```
+It is possible to configure environment variables for the user and password in sentinelsat and avoid entering them in the command line. Simply write the following lines in the `~/.bashrc` file
 
+
+```
+export DHUS_USER="<user>"
+export DHUS_PASSWORD="<password>"
+export DHUS_URL="https://scihub.copernicus.eu/dhus"
+``
 
 
 
