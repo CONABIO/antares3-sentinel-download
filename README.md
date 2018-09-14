@@ -91,6 +91,14 @@ alias L2A_Process='/home/<user>/Sen2Cor-02.05.05-Linux64/bin/L2A_Process'
 ```
 The complete path depends on the folder of installation defined for sen2cor.
 
+# Parallel downloading
+
+To speed up the download process, you can use the python script for parallel downloads, simultaneously downloading as many scenes as cores in the CPU. The python script reads the geojson file from the query, then builds the sentinelhub commands and runs them in parallel.
+
+```bash
+python parallel_downloads.py
+```
+
 # Note
 
 
