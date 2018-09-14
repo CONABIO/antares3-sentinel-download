@@ -72,7 +72,7 @@ for feature in data['features']:
     tmp_list.append("--product")
     tmp_list.append(feature['properties']['identifier'])
     tmp_list.append("-f")
-    tmp_list.append("~/s2_downloads")
+    tmp_list.append("/home/ubuntu/s2_downloads")
     commands.append(tmp_list)
 
 exec_commands(commands)
