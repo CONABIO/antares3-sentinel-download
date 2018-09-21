@@ -102,7 +102,9 @@ python parallel_downloads.py
 # Note
 
 
-There is a preconfigured AMI for MAD-Mex called `sentinel2_download_preproc` with all the libraries and configurations needed to reproduce this example.
+1 .- There is a preconfigured AMI for MAD-Mex called `sentinel2_download_preproc` with all the libraries and configurations   needed to reproduce this example.
+
+2.- If what you want is to process a scene that is already in S3, maybe it is more convenient to copy it to the EC2. Keep in mind that this will cause empty folders to not be copied, therefore, to run sen2cor properly, folders that are lost when copying a scene in S3 must be generated. This is to generate the folders HTML, AUX_DATA and rep_info inside the folder with .SAFE format.
 
 
 
