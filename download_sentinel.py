@@ -1,9 +1,13 @@
 import sys
 import argparse
 import sentinelsat
+import logging
 
 from sentinelsat import SentinelAPI, read_geojson, geojson_to_wkt
 from datetime import date
+
+logging.basicConfig(level=logging.DEBUG)
+
 
 def cmdline_args():
     # Make parser object
@@ -80,8 +84,8 @@ def search(user, psswd, sensor, file, start, end):
                              sensoroperationalmode = 'IW')
 
     for x in products:
-        print (products[x]["filename"], products[x]["size"] )
-    print("Found {} scenes in the region specified".format(len(products)))
+        logging.info("\t {}, {} ".format(products[x]["filename"], products[x]["size"]) )
+    logging.info("Found {} scenes in the region specified".format(len(products)))
 
     return (products, api)
     
@@ -90,7 +94,8 @@ def download_products(scenes, api):
         Downloads all the escenes found by query
     '''
     api.download_all(scenes)
-    
+
+
 if __name__ == '__main__':
     
     if sys.version_info<(3,0,0):
@@ -99,15 +104,19 @@ if __name__ == '__main__':
         
     try:
         args = cmdline_args()
-        print(args)
-    except:
-        print('Try : \n download_sentinel.py -t s1 -g test.geojson -s 2018-01-0 -e 2018-12-31')
+        logging.info(args)
+        scenes, api = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end)
 
-    scenes, api = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end)
-
-    if args.download:
-        print ("Starting download")
+        if args.download:
+            logging.info("Starting download")
+        
         download_products(scenes, api)
+    except:
+        logging.warning('Try : \n download_sentinel.py -u <user> -p <psswd> -t s1 -g /path/to/file.geojson -s 20180101 -e 20180103')
+
+    
+
+    
         
     
 
