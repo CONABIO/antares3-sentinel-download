@@ -54,7 +54,7 @@ def cmdline_args():
 
 
 def search(sensor, file, start, end):
-    api = SentinelAPI('robmartz00', 'mequetrepe.2','https://scihub.copernicus.eu/dhus')
+    api = SentinelAPI('robmartz00', 'mequetrepe.2', 'https://scihub.copernicus.eu/dhus')
     footprint = geojson_to_wkt(read_geojson(file))
     
     if sensor == 's1':
@@ -65,6 +65,10 @@ def search(sensor, file, start, end):
                              polarisationmode = 'VV VH',
                              producttype = 'GRD',
                              sensoroperationalmode = 'IW')
+
+    for x in products:
+        print (products[x]["filename"], products[x]["size"] )
+    print("Found {} scenes in the region specified".format(len(products)))
         
     
 if __name__ == '__main__':
