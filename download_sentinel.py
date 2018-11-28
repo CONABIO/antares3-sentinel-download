@@ -13,6 +13,14 @@ def cmdline_args():
         """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
+    parser.add_argument("-u", "--user",
+                        required=True,
+                        help="User ESA account")
+    
+    parser.add_argument("-p", "--password",
+                        required=True,
+                        help="Password ESA account")
+
     parser.add_argument("-t", "--satelite",
                         type=str,
                         choices=["s1","s2"],
@@ -53,8 +61,12 @@ def cmdline_args():
     return(parser.parse_args())
 
 
-def search(sensor, file, start, end):
-    api = SentinelAPI('robmartz00', 'mequetrepe.2', 'https://scihub.copernicus.eu/dhus')
+def search(user, psswd, sensor, file, start, end):
+    '''
+        
+    '''
+    url = 'https://scihub.copernicus.eu/dhus'
+    api = SentinelAPI(user, psswd, url)
     footprint = geojson_to_wkt(read_geojson(file))
     
     if sensor == 's1':
@@ -69,7 +81,7 @@ def search(sensor, file, start, end):
     for x in products:
         print (products[x]["filename"], products[x]["size"] )
     print("Found {} scenes in the region specified".format(len(products)))
-        
+    
     
 if __name__ == '__main__':
     
@@ -83,7 +95,7 @@ if __name__ == '__main__':
     except:
         print('Try : \n download_sentinel.py -t s1 -g test.geojson -s 2018-01-0 -e 2018-12-31')
 
-    search(args.satelite, args.geojson, args.start, args.end)
+    search(args.user, args.password, args.satelite, args.geojson, args.start, args.end)
 
     
 
