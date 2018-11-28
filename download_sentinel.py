@@ -1,5 +1,9 @@
 import sys
 import argparse
+import sentinelsat
+
+from sentinelsat import SentinelAPI, read_geojson, geojson_to_wkt
+from datetime import date
 
 def cmdline_args():
     # Make parser object
@@ -16,32 +20,53 @@ def cmdline_args():
                         help="Sensor type to download, can be sentinel-2 or sentinel-1")
 
     parser.add_argument("-g", "--geojson",
-                        type=argparse.FileType('r'),
                         required=True,
                         help="Geojson geometry file. It should be a polygon as simple as possible")
 
     parser.add_argument("-s", 
-                        "--start-date", 
+                        "--start", 
                         required=True,
-                        help="The Start Date - format YYYY-MM-DD")
+                        help="The Start Date - format YYYYMMDD")
 
     parser.add_argument("-e", 
-                        "--end-date", 
+                        "--end", 
                         required=True,
-                        help="The End Date - format YYYY-MM-DD")
+                        help="The End Date - format YYYYMMDD")
+
+    parser.add_argument("-c", 
+                        "--max-cloudcover", 
+                        required=False,
+                        default=100,
+                        help="Maximum cloudiness in scene")
 
     parser.add_argument("-d","--download",
                         action="store_true",
                         help="include to enable")
 
     parser.add_argument("-v", "--verbosity",
-                        type=int, choices=[0,1,2], default=0,
+                        type=int,
+                        choices=[0,1,2],
+                        default=0,
                         help="Increase output verbosity")
 
 
     return(parser.parse_args())
 
 
+def search(sensor, file, start, end):
+    api = SentinelAPI('robmartz00', 'mequetrepe.2','https://scihub.copernicus.eu/dhus')
+    footprint = geojson_to_wkt(read_geojson(file))
+    
+    if sensor == 's1':
+        products = api.query(footprint,
+                             date = (start, end),
+                             platformname = 'Sentinel-1',
+                             orbitdirection = 'ascending',
+                             polarisationmode = 'VV VH',
+                             producttype = 'GRD',
+                             sensoroperationalmode = 'IW')
+        
+    
 if __name__ == '__main__':
     
     if sys.version_info<(3,0,0):
@@ -54,4 +79,8 @@ if __name__ == '__main__':
     except:
         print('Try : \n download_sentinel.py -t s1 -g test.geojson -s 2018-01-0 -e 2018-12-31')
 
-    print()
+    search(args.satelite, args.geojson, args.start, args.end)
+
+    
+
+
