@@ -9,7 +9,7 @@ def cmdline_args():
     # Make parser object
     parser = argparse.ArgumentParser(description=
         """
-        This is a script to download Sentinel-1 and Sentinel-2 scenes.
+            This is a script to download Sentinel-1 and Sentinel-2 scenes.
         """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
@@ -63,7 +63,8 @@ def cmdline_args():
 
 def search(user, psswd, sensor, file, start, end):
     '''
-        
+        Searching for all the available scenes in the specified
+        region and with the parameters provided by user
     '''
     url = 'https://scihub.copernicus.eu/dhus'
     api = SentinelAPI(user, psswd, url)
@@ -81,7 +82,14 @@ def search(user, psswd, sensor, file, start, end):
     for x in products:
         print (products[x]["filename"], products[x]["size"] )
     print("Found {} scenes in the region specified".format(len(products)))
+
+    return (products, api)
     
+def download_products(scenes, api):
+    '''
+        Downloads all the escenes found by query
+    '''
+    api.download_all(scenes)
     
 if __name__ == '__main__':
     
@@ -95,8 +103,12 @@ if __name__ == '__main__':
     except:
         print('Try : \n download_sentinel.py -t s1 -g test.geojson -s 2018-01-0 -e 2018-12-31')
 
-    search(args.user, args.password, args.satelite, args.geojson, args.start, args.end)
+    scenes, api = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end)
 
+    if args.download:
+        print ("Starting download")
+        download_products(scenes, api)
+        
     
 
 
