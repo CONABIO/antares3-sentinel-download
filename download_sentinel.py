@@ -6,7 +6,7 @@ import logging
 from sentinelsat import SentinelAPI, read_geojson, geojson_to_wkt
 from datetime import date
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def cmdline_args():
@@ -35,20 +35,17 @@ def cmdline_args():
                         required=True,
                         help="Geojson geometry file. It should be a polygon as simple as possible")
 
-    parser.add_argument("-s", 
-                        "--start", 
+    parser.add_argument("-s", "--start", 
                         required=True,
                         help="The Start Date - format YYYYMMDD")
 
-    parser.add_argument("-e", 
-                        "--end", 
+    parser.add_argument("-e", "--end", 
                         required=True,
                         help="The End Date - format YYYYMMDD")
 
-    parser.add_argument("-c", 
-                        "--max-cloudcover", 
+    parser.add_argument("-c", "--maxcloud", 
                         required=False,
-                        default=100,
+                        default=1,
                         help="Maximum cloudiness in scene")
 
     parser.add_argument("-d","--download",
@@ -65,7 +62,7 @@ def cmdline_args():
     return(parser.parse_args())
 
 
-def search(user, psswd, sensor, file, start, end):
+def search(user, psswd, sensor, file, start, end, maxcloud):
     '''
         Searching for all the available scenes in the specified
         region and with the parameters provided by user
@@ -78,14 +75,20 @@ def search(user, psswd, sensor, file, start, end):
         products = api.query(footprint,
                              date = (start, end),
                              platformname = 'Sentinel-1',
-                             orbitdirection = 'ascending',
+                             orbitdirection = 'ASCENDING',
                              polarisationmode = 'VV VH',
                              producttype = 'GRD',
                              sensoroperationalmode = 'IW')
 
+    if sensor == 's2':
+        products = api.query(footprint,
+                             date = (start, end),
+                             platformname='Sentinel-2',
+                             cloudcoverpercentage=(0, maxcloud))
+
     for x in products:
-        logging.info("\t {}, {} ".format(products[x]["filename"], products[x]["size"]) )
-    logging.info("Found {} scenes in the region specified".format(len(products)))
+        logging.info("\t {}  {} ".format(products[x]["filename"], products[x]["size"]) )
+    logging.info("\t Found {} scenes in the region specified".format(len(products)))
 
     return (products, api)
     
@@ -105,12 +108,11 @@ if __name__ == '__main__':
     try:
         args = cmdline_args()
         logging.info(args)
-        scenes, api = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end)
+        scenes, api = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end, args.maxcloud)
 
         if args.download:
             logging.info("Starting download")
-        
-        download_products(scenes, api)
+            download_products(scenes, api)
     except:
         logging.warning('Try : \n download_sentinel.py -u <user> -p <psswd> -t s1 -g /path/to/file.geojson -s 20180101 -e 20180103')
 
