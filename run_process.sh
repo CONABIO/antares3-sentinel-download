@@ -95,8 +95,6 @@ run() {
         [ $arg_d == 'sge' ] && ( run_with_download_sge )
     }
 
-
-
     echo "user:     " $user
     echo "password: " $psswd
     echo "geojson:  " $gfile
@@ -105,9 +103,26 @@ run() {
 
 }
 
+exit_confirmed=0
+clean_up() {
+    (( exit_confirmed == 0 )) && {
+        exit_confirmed=1
+        echo "Are you sure? Ctrl+C again to exit."
+        return 0
+    }
+
+    # Begin clean-up here
+
+    exit 1
+}
+register_signal_handlers() {
+    trap clean_up INT TERM
+}
+
 main() {
     show_options "$@"
     parse_options "$@"
+    register_signal_handlers
     run
 }
 
