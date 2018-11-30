@@ -23,7 +23,6 @@ show_options() {
 }
 
 parse_options() {
-
     while getopts :otd:u:p:g:s:e: opt
     do
       case $opt in
@@ -64,6 +63,22 @@ parse_options() {
     done
 }
 
+s1_preprocess() {
+    echo "s1 preprocess enabled"
+}
+
+s2_preprocess() {
+    echo "s2 preprocess enabled"
+}
+
+run_with_download_local() {
+    echo "Running python with download local..."
+}
+
+run_with_download_sge() {
+    echo "Running python with download with sge..."
+}
+
 
 run() {
 
@@ -71,14 +86,16 @@ run() {
       echo "s1_preprocess"
     }
 
-    (( $ARG_D == 1 )) && {
-        [ $arg_d == 'local' ] && ( echo "run_with_download_local" )
-        [ $arg_d == 'sge' ] && ( echo "run_with_download_sge" )
-    }
-
     (( $ARG_T == 1 )) && {
         echo "s2_preprocess"
     }
+
+    (( $ARG_D == 1 )) && {
+        [ $arg_d == 'local' ] && ( run_with_download_local )
+        [ $arg_d == 'sge' ] && ( run_with_download_sge )
+    }
+
+
 
     echo "user:     " $user
     echo "password: " $psswd
@@ -87,7 +104,6 @@ run() {
     echo "end:      " $end
 
 }
-
 
 main() {
     show_options "$@"
