@@ -13,7 +13,12 @@ def cmdline_args():
     # Make parser object
     parser = argparse.ArgumentParser(description=
         """
-            This is a script to download Sentinel-1 and Sentinel-2 scenes.
+            This script performs a search of the available scenes of sentinel-1 and sentinel-2
+            according to the parameters provided by the user. Additionally, if download is
+            required, it will be done in the directory provided. It is highly recommended to 
+            download only small amounts of scenes with this script. If you want to download many
+            scenes it is recommended to do it with Sun Grid Engine providing the appropriate 
+            flag for it.
         """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
@@ -114,7 +119,7 @@ if __name__ == '__main__':
             logging.info("Starting download")
             download_products(scenes, api)
     except:
-        logging.warning('Try : \n download_sentinel.py -u <user> -p <psswd> -t s1 -g /path/to/file.geojson -s 20180101 -e 20180103')
+        logging.info('Try : \n download_sentinel.py -u <user> -p <psswd> -t s1 -g /path/to/file.geojson -s YYYYMMDD -e YYYYMMDD')
 
     
 
