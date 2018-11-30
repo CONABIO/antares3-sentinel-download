@@ -12,7 +12,7 @@ show_options() {
         echo
         echo "       -o               Preprocess of Sentinel-1"
         echo "       -t               Preprocess of Sentinel-2"
-        echo "       -d <option>      Download mode: local or sge"
+        echo "       -d <option>      Download mode: local, sge or none"
         echo "       -u <user>        User"
         echo "       -p <psswd>       Password"
         echo "       -g <path/file>   Geojson file"
@@ -28,11 +28,13 @@ parse_options() {
       case $opt in
         o)
           ARG_O=1
-          echo "ARG_O is set"
+          SATELITE="s1"
+          #echo "ARG_O is set"
           ;;
         t)
           ARG_T=1
-          echo "ARG_T is set"
+          SATELITE="s2"
+          #echo "ARG_T is set"
           ;;
         d)
           arg_d=$OPTARG
@@ -63,66 +65,59 @@ parse_options() {
     done
 }
 
-s1_preprocess() {
-    echo "s1 preprocess enabled"
-}
-
-s2_preprocess() {
-    echo "s2 preprocess enabled"
+check_download_mode() {
+  (( $ARG_D == 1 )) && {
+        [ $arg_d == 'local' ] && ( run_with_download_local )
+        [ $arg_d == 'sge' ] && ( run_with_download_sge )
+        [ $arg_d == 'none' ] && ( run_without_download )
+    }
 }
 
 run_with_download_local() {
     echo "Running python with download local..."
+    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d
 }
 
 run_with_download_sge() {
     echo "Running python with download with sge..."
+    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d
 }
 
+run_without_download() {
+    echo "Running python without download..."
+    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end
+}
+
+s1_preprocess() {
+    echo "s1 preprocess enabled"
+    # Download S1
+    check_download_mode
+    # Preproc S1
+    # Upload to s3
+}
+
+s2_preprocess() {
+    echo "s2 preprocess enabled"
+    # Download S2
+    check_download_mode
+    # Preproc S1
+    # Upload to s3
+}
 
 run() {
 
     (( $ARG_O == 1 )) && {
-      echo "s1_preprocess"
+      s1_preprocess
     }
 
     (( $ARG_T == 1 )) && {
-        echo "s2_preprocess"
-    }
-
-    (( $ARG_D == 1 )) && {
-        [ $arg_d == 'local' ] && ( run_with_download_local )
-        [ $arg_d == 'sge' ] && ( run_with_download_sge )
-    }
-
-    echo "user:     " $user
-    echo "password: " $psswd
-    echo "geojson:  " $gfile
-    echo "start:    " $start
-    echo "end:      " $end
-
-}
-
-exit_confirmed=0
-clean_up() {
-    (( exit_confirmed == 0 )) && {
-        exit_confirmed=1
-        echo "Are you sure? Ctrl+C again to exit."
-        return 0
-    }
-
-    # Begin clean-up here
-
-    exit 1
-}
-register_signal_handlers() {
-    trap clean_up INT TERM
+        s2_preprocess
+    } 
 }
 
 main() {
     show_options "$@"
     parse_options "$@"
-    register_signal_handlers
     run
 }
 
