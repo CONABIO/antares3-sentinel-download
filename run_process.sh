@@ -75,17 +75,17 @@ check_download_mode() {
 
 run_with_download_local() {
     echo "Running python with download local..."
-    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d
+    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d
 }
 
 run_with_download_sge() {
     echo "Running python with download with sge..."
-    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d
+    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d
 }
 
 run_without_download() {
     echo "Running python without download..."
-    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end
+    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d
 }
 
 s1_preprocess() {
@@ -105,11 +105,9 @@ s2_preprocess() {
 }
 
 run() {
-
     (( $ARG_O == 1 )) && {
       s1_preprocess
     }
-
     (( $ARG_T == 1 )) && {
         s2_preprocess
     } 

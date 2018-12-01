@@ -54,8 +54,9 @@ def cmdline_args():
                         help="Maximum cloudiness in scene")
 
     parser.add_argument("-d","--download",
-                        action="store_true",
-                        help="include to enable")
+                        choices=["local","sge", "none"],
+                        default="none",
+                        help="Download mode")
 
     parser.add_argument("-v", "--verbosity",
                         type=int,
@@ -89,13 +90,17 @@ def search(user, psswd, sensor, file, start, end, maxcloud):
         products = api.query(footprint,
                              date = (start, end),
                              platformname='Sentinel-2',
-                             cloudcoverpercentage=(0, maxcloud))
-
+                                cloudcoverpercentage=(0, maxcloud))
+   
     for x in products:
         logging.info("\t {}  {} ".format(products[x]["filename"], products[x]["size"]) )
     logging.info("\t Found {} scenes in the region specified".format(len(products)))
 
-    return (products, api)
+    with open("scenes_found.txt", "w") as f:
+        for i in products:
+            f.write(products[i]["identifier"]+ "\n")
+
+    return (products)
     
 def download_products(scenes, api):
     '''
@@ -113,13 +118,26 @@ if __name__ == '__main__':
     try:
         args = cmdline_args()
         logging.info(args)
-        scenes, api = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end, args.maxcloud)
+        if args.download == "local":
+            logging.info("Querying scenes")
+            scenes = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end, args.maxcloud)
+            
+            logging.info("Starting local download ")
+            #download_local()
 
-        if args.download:
-            logging.info("Starting download")
-            download_products(scenes, api)
+        if args.download == "sge":
+            logging.info("Querying scenes")
+            scenes = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end, args.maxcloud)
+            
+            logging.info("Starting SGE download")
+            #download_sge()
+
+        if args.download == "none":
+            logging.info("Querying scenes")
+            scenes = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end, args.maxcloud)
     except:
-        logging.info('Try : \n download_sentinel.py -u <user> -p <psswd> -t s1 -g /path/to/file.geojson -s YYYYMMDD -e YYYYMMDD')
+        logging.error("Oops!",sys.exc_info()[0],"occured.")
+        logging.info('Try : \n download_sentinel.py -u <user> -p <psswd> -t <satelite> -g /path/to/file.geojson -s YYYYMMDD -e YYYYMMDD')
 
     
 
