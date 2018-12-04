@@ -5,6 +5,7 @@ import logging
 
 from sentinelsat import SentinelAPI, read_geojson, geojson_to_wkt
 from datetime import date
+from _download import exec_commands
 
 logging.basicConfig(level=logging.INFO)
 
@@ -102,11 +103,31 @@ def search(user, psswd, sensor, file, start, end, maxcloud):
 
     return (products)
     
-def download_products(scenes, api):
+def download_local(out_dir):
     '''
         Downloads all the escenes found by query
     '''
-    api.download_all(scenes)
+    commands = []
+    with open("scenes_found.txt") as f:
+        for line in f:
+            tmp_list = []
+            tmp_list.append("sentinelhub.aws")
+            tmp_list.append("--product")
+            tmp_list.append(line[:-1])
+            tmp_list.append("-f")
+            tmp_list.append(out_dir)
+            commands.append(tmp_list)
+    
+    exec_commands(commands, len(commands))
+
+
+def download_sge(out_dir):
+    '''
+        Downloads all the scenes found by query
+    '''
+    # api.download_all(scenes)
+    print ("Download sge")
+
 
 
 if __name__ == '__main__':
@@ -118,19 +139,24 @@ if __name__ == '__main__':
     try:
         args = cmdline_args()
         logging.info(args)
+        if args.satelite == "s1":
+            outdir = "s1_downloads"
+
+        if args.satelite == "s2":
+            outdir = "s2_downloads"
+
         if args.download == "local":
             logging.info("Querying scenes")
             scenes = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end, args.maxcloud)
-            
-            logging.info("Starting local download ")
-            #download_local()
+            logging.info("Starting local download")
+            download_local(outdir)
 
         if args.download == "sge":
             logging.info("Querying scenes")
             scenes = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end, args.maxcloud)
             
             logging.info("Starting SGE download")
-            #download_sge()
+            download_sge(outdir)
 
         if args.download == "none":
             logging.info("Querying scenes")
