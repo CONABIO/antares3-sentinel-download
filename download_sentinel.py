@@ -105,7 +105,7 @@ def search(user, psswd, sensor, file, start, end, maxcloud):
     
 def download_local(out_dir):
     '''
-        Downloads all the escenes found by query
+        Downloads all the scenes found by query
     '''
     commands = []
     with open("scenes_found.txt") as f:
@@ -127,8 +127,6 @@ def download_sge(out_dir):
     '''
     # api.download_all(scenes)
     print ("Download sge")
-
-
 
 if __name__ == '__main__':
     

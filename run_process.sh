@@ -8,22 +8,24 @@ show_options() {
     # if no param is given, display a menu and then exit
     (( $# < 1 )) && {
         # display a menu of options
+        echo " "
         echo "            MAIN MENU"
         echo
-        echo "       -o               Preprocess of Sentinel-1"
-        echo "       -t               Preprocess of Sentinel-2"
-        echo "       -d <option>      Download mode: local, sge or none"
-        echo "       -u <user>        User"
-        echo "       -p <psswd>       Password"
-        echo "       -g <path/file>   Geojson file"
-        echo "       -s <start-date>  Start date"
-        echo "       -e <end-date>    End date"
+        echo "       -o                Preprocess of Sentinel-1"
+        echo "       -t                Preprocess of Sentinel-2"
+        echo "       -d  <option>      Download mode: local, sge or none"
+        echo "       -u  <user>        User"
+        echo "       -p  <psswd>       Password"
+        echo "       -g  <path/file>   Geojson file"
+        echo "       -s  <start-date>  Start date YYYYMMDD"
+        echo "       -e  <end-date>    End date YYYYMMDD"
+        echo "       -c  <max cloud>   Maximum coverage of clouds per scene"
         exit 1
     }
 }
 
 parse_options() {
-    while getopts :otd:u:p:g:s:e: opt
+    while getopts :otd:u:p:g:s:e:c opt
     do
       case $opt in
         o)
@@ -56,6 +58,9 @@ parse_options() {
         e)
           end="${13}"
           ;;
+        c)
+          cloud="${15}"
+          ;;
         ?)
           echo "Unknow option"
           echo "$OPTARG is not valid"
@@ -76,18 +81,18 @@ check_download_mode() {
 run_with_download_local() {
     echo "Running python with download local..."
     mkdir $SATELITE"_downloads"
-    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d
+    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d -c $cloud
 }
 
 run_with_download_sge() {
     echo "Running python with download with sge..."
     mkdir $SATELITE"_downloads"
-    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d
+    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d -c $cloud
 }
 
 run_without_download() {
     echo "Running python without download..."
-    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d
+    echo python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d -c $cloud
 }
 
 s1_preprocess() {
@@ -107,6 +112,18 @@ s2_preprocess() {
 }
 
 run() {
+
+    if [ -z $cloud ]; 
+      then 
+        cloud=${15:-1}
+    fi
+    
+    if [ $ARG_O == 1 ] && [ $ARG_T == 1 ]
+      then
+        echo "Is not possible to operate both sensors at the same time"
+        exit 1
+    fi
+
     (( $ARG_O == 1 )) && {
       s1_preprocess
     }
