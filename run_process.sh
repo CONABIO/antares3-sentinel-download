@@ -75,11 +75,13 @@ check_download_mode() {
 
 run_with_download_local() {
     echo "Running python with download local..."
+    mkdir $SATELITE"_downloads"
     python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d
 }
 
 run_with_download_sge() {
     echo "Running python with download with sge..."
+    mkdir $SATELITE"_downloads"
     python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d
 }
 
@@ -116,6 +118,8 @@ run() {
 main() {
     show_options "$@"
     parse_options "$@"
+    [ -e $SATELITE"_downloads" ] && rm -rf $SATELITE"_downloads"
+    [ -e "scenes_found.txt" ] && rm "scenes_found.txt"
     run
 }
 
