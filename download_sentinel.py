@@ -128,6 +128,7 @@ def download_local_s2(out_dir):
 
     exec_commands(commands, len(commands))
 
+
 def download_local_s1(scenes, api):
     '''
         Downloads all the scenes found by query
@@ -141,6 +142,7 @@ def download_sge(out_dir):
     '''
     # api.download_all(scenes)
     print ("Download sge")
+
 
 if __name__ == '__main__':
 
