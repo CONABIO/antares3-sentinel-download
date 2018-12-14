@@ -86,29 +86,37 @@ def search(user, psswd, sensor, file, start, end, maxcloud):
                              polarisationmode = 'VV VH',
                              producttype = 'GRD',
                              sensoroperationalmode = 'IW')
+        for x in products:
+            logging.info("\t {}  {} ".format(products[x]["filename"], products[x]["size"]) )
+        logging.info("\t Found {} scenes in the region specified".format(len(products)))
+
+        with open("scenes_s1_found.txt", "w") as f:
+            for i in products:
+                f.write(products[i]["uuid"]+ "\n")
+
+        return (products, api)
 
     if sensor == 's2':
         products = api.query(footprint,
                              date = (start, end),
                              platformname='Sentinel-2',
-                                cloudcoverpercentage=(0, maxcloud))
+                             cloudcoverpercentage=(0, maxcloud))
+        for x in products:
+            logging.info("\t {}  {} ".format(products[x]["filename"], products[x]["size"]) )
+        logging.info("\t Found {} scenes in the region specified".format(len(products)))
 
-    for x in products:
-        logging.info("\t {}  {} ".format(products[x]["filename"], products[x]["size"]) )
-    logging.info("\t Found {} scenes in the region specified".format(len(products)))
+        with open("scenes_s2_found.txt", "w") as f:
+            for i in products:
+                f.write(products[i]["identifier"]+ "\n")
 
-    with open("scenes_found.txt", "w") as f:
-        for i in products:
-            f.write(products[i]["identifier"]+ "\n")
+        return (products)
 
-    return (products)
-
-def download_local(out_dir):
+def download_local_s2(out_dir):
     '''
         Downloads all the scenes found by query
     '''
     commands = []
-    with open("scenes_found.txt") as f:
+    with open("scenes_s2_found.txt") as f:
         for line in f:
             tmp_list = []
             tmp_list.append("sentinelhub.aws")
@@ -119,6 +127,12 @@ def download_local(out_dir):
             commands.append(tmp_list)
 
     exec_commands(commands, len(commands))
+
+def download_local_s1(scenes, api):
+    '''
+        Downloads all the scenes found by query
+    '''
+    api.download_all(scenes)
 
 
 def download_sge(out_dir):
@@ -143,16 +157,21 @@ if __name__ == '__main__':
         if args.satelite == "s2":
             outdir = "s2_downloads"
 
-        if args.download == "local":
+        if args.download == "local" and args.satelite == "s2":
             logging.info("Querying scenes")
             scenes = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end, args.maxcloud)
-            logging.info("Starting local download")
-            download_local(outdir)
+            logging.info("Starting local download for Sentinel-2")
+            download_local_s2(outdir)
+
+        if args.download == "local" and args.satelite == "s1":
+            logging.info("Querying scenes")
+            scenes, a = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end, args.maxcloud)
+            logging.info("Starting local download Sentinel-1")
+            download_local_s1(scenes, a)
 
         if args.download == "sge":
             logging.info("Querying scenes")
             scenes = search(args.user, args.password, args.satelite, args.geojson, args.start, args.end, args.maxcloud)
-
             logging.info("Starting SGE download")
             download_sge(outdir)
 
