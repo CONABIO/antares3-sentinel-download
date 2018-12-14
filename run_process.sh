@@ -19,7 +19,7 @@ show_options() {
         echo "       -g  <path/file>   Geojson file"
         echo "       -s  <start-date>  Start date YYYYMMDD"
         echo "       -e  <end-date>    End date YYYYMMDD"
-        echo "       -c  <max cloud>   Maximum coverage of clouds per scene"
+        echo "       -c  <max cloud>   Maximum coverage of clouds per scene [0-1]"
         exit 1
     }
 }
@@ -72,27 +72,20 @@ parse_options() {
 
 check_download_mode() {
   (( $ARG_D == 1 )) && {
-        [ $arg_d == 'local' ] && ( run_with_download_local )
-        [ $arg_d == 'sge' ] && ( run_with_download_sge )
-        [ $arg_d == 'none' ] && ( run_without_download )
+        download_sentinel
     }
 }
 
-run_with_download_local() {
-    echo "Running python with download local..."
-    mkdir $SATELITE"_downloads"
-    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d -c $cloud
-}
+download_sentinel() {
+    if [ $arg_d == 'local' ] || [ $arg_d == 'sge' ] ; then
+      mkdir $SATELITE"_downloads"
+    fi
+    if [ $arg_d != 1 ]; then
+      python -B download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d -c $cloud
+    else
+      python -B download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d
+    fi
 
-run_with_download_sge() {
-    echo "Running python with download with sge..."
-    mkdir $SATELITE"_downloads"
-    python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d -c $cloud
-}
-
-run_without_download() {
-    echo "Running python without download..."
-    echo python download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d -c $cloud
 }
 
 s1_preprocess() {
@@ -113,11 +106,17 @@ s2_preprocess() {
 
 run() {
 
-    if [ -z $cloud ]; 
-      then 
+    if [ $ARG_O == 1 ] && [ ! -z $cloud ]
+      then
+        echo "    It is not necessary to specify maximum cloudiness with Sentinel-1"
+        echo "    Input value will be ignored."
+    fi
+
+    if [ -z $cloud ];
+      then
         cloud=${15:-1}
     fi
-    
+
     if [ $ARG_O == 1 ] && [ $ARG_T == 1 ]
       then
         echo "Is not possible to operate both sensors at the same time"
@@ -129,7 +128,7 @@ run() {
     }
     (( $ARG_T == 1 )) && {
         s2_preprocess
-    } 
+    }
 }
 
 main() {
