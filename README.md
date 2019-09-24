@@ -96,6 +96,14 @@ The complete path depends on the folder of installation defined for sen2cor.
 We can run `sen2cor.2.8.0` with dem as a docker service creating an image from [here](https://github.com/CONABIO/sen2cor_docker). The following is an example how to create two services:
 
 ```bash
+archives=/LUSTRE/MADMEX/tasks/2019_tasks/sen2cor_docker/data_zipped
+unzipped_scenes=/LUSTRE/MADMEX/tasks/2019_tasks/sen2cor_docker/data_unzipped
+src=/LUSTRE/MADMEX/tasks/2019_tasks/sen2cor_docker/sentinel_processing_version_2.8.0/src/
+aux=/LUSTRE/MADMEX/sentinel2_aux_data/data/CCI4SEN2COR/
+aux_container=/Sen2Cor-02.08.00-Linux64/lib/python2.7/site-packages/sen2cor/aux_data/
+```
+
+```bash
 sudo docker service create --name l2a --detach=false --restart-condition=on-failure --env USERID=1000 \
 --env SEN2COR_HOME=/sen2cor --env SEN2COR_BIN=/sen2cor \
 --workdir=/var/sentinel2_data/unzipped_scenes \
