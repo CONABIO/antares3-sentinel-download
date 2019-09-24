@@ -91,6 +91,50 @@ alias L2A_Process='/home/<user>/Sen2Cor-02.05.05-Linux64/bin/L2A_Process'
 ```
 The complete path depends on the folder of installation defined for sen2cor.
 
+## sen2cor as docker service
+
+We can run `sen2cor.2.8.0` with dem as a docker service creating an image from [here](https://github.com/CONABIO/sen2cor_docker). The following is an example how to create two services:
+
+```bash
+sudo docker service create --name l2a --detach=false --restart-condition=on-failure --env USERID=1000 \
+--env SEN2COR_HOME=/sen2cor --env SEN2COR_BIN=/sen2cor \
+--workdir=/var/sentinel2_data/unzipped_scenes \
+--mount type=bind,source=$archives,destination=/var/sentinel2_data/archives \
+--mount type=bind,source=$unzipped_scenes,destination=/var/sentinel2_data/unzipped_scenes \
+--mount type=bind,source=$src,destination=/src \
+--mount type=bind,source=$aux,destination=$aux_container \
+madmex/sen2cordocker_l2a:2.8.0 \
+/src/wrapper.sh -d S2A_MSIL1C_20180107T175721_N0206_R141_T12QUM_20180107T193335
+```
+
+```bash
+sudo docker service create --name l2a-2 --detach=false --restart-condition=on-failure --env USERID=1000 \
+--env SEN2COR_HOME=/sen2cor --env SEN2COR_BIN=/sen2cor \
+--workdir=/var/sentinel2_data/unzipped_scenes \
+--mount type=bind,source=$archives,destination=/var/sentinel2_data/archives \
+--mount type=bind,source=$unzipped_scenes,destination=/var/sentinel2_data/unzipped_scenes \
+--mount type=bind,source=$src,destination=/src \
+--mount type=bind,source=$aux,destination=$aux_container \
+madmex/sen2cordocker_l2a:2.8.0 \
+/src/wrapper.sh -d S2A_MSIL1C_20180107T175721_N0206_R141_T12QVM_20180107T193335
+```
+
+to monitor them:
+```bash
+sudo docker service ps l2a
+```
+
+to view the logs:
+```bash
+sudo docker service logs l2a
+sudo docker service logs l2a-2
+```
+
+and to delete the ones that already finished:
+```bash
+for container in $(sudo docker service ps l2a | grep Shutdown  | tr -s ' ' | cut -d' ' -f2 | cut -d'.' -f1); do sudo docker service rm $container; done
+```
+
 # Parallel downloading
 
 To speed up the download process, you can use the python script for parallel downloads, simultaneously downloading as many scenes as cores in the CPU. The python script reads the geojson file from the query, then builds the sentinelhub commands and runs them in parallel.
