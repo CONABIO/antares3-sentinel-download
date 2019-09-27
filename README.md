@@ -152,7 +152,7 @@ for container in $(sudo docker service ps l2a | grep Shutdown  | tr -s ' ' | cut
 2. Create shell `sen2cor_preprocess_with_docker.sh`:
 
 
-**Note: modify `exclude` and `partition flags according to your specifications**
+**Note: modify `exclude` and `partition` flags according to your specifications**
 
 ```
 #!/bin/bash
