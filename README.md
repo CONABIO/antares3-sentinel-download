@@ -180,10 +180,8 @@ id_container=$(sudo docker run  \
 
 
 status=$(sudo docker ps -a -f id=$id_container --format "{{.Status}}"|cut -d' ' -f1)
-#linea=$(sudo docker logs $id_container|tail -n 1)
 mkdir logs_docker
 logfile=logs_docker/$(basename -s '.zip' $1).txt
-#echo $linea >> $logfile
 
 while [ "$status" == "Up" ]
 do
