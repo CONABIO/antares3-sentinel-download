@@ -143,6 +143,75 @@ and to delete the ones that already finished:
 for container in $(sudo docker service ps l2a | grep Shutdown  | tr -s ' ' | cut -d' ' -f2 | cut -d'.' -f1); do sudo docker service rm $container; done
 ```
 
+## sen2cor with SLURM
+
+1. Create file `list_zipped.txt` with zip files to preprocess with sen2cor.
+
+2. Create shell `sen2cor_preprocess_with_docker.sh`:
+
+
+**Note: modify exclude and partition flags according to you**
+
+```
+#!/bin/bash
+# first parameter is file to preprocess with sen2cor
+
+#SBATCH --partition=cacomixtle
+#SBATCH --ntasks=1           # total processes across nodes
+#SBATCH --ntasks-per-node=1
+#SBATCH --requeue
+#SBATCH --exclude keri,nodo2,nodo4,nodo5
+
+archives=/LUSTRE/MADMEX/tasks/2019_tasks/sen2cor_docker/data_zipped
+unzipped_scenes=/LUSTRE/MADMEX/tasks/2019_tasks/sen2cor_docker/data_unzipped_slurm
+src=/LUSTRE/MADMEX/tasks/2019_tasks/sen2cor_docker/sentinel_processing_version_2.8.0/src/
+aux=/LUSTRE/MADMEX/sentinel2_aux_data/data/CCI4SEN2COR/
+aux_container=/Sen2Cor-02.08.00-Linux64/lib/python2.7/site-packages/sen2cor/aux_data/
+
+id_container=$(sudo docker run  \
+-e USERID=1000 -e SEN2COR_HOME=/sen2cor -e SEN2COR_BIN=/sen2cor \
+--workdir=/var/sentinel2_data/unzipped_scenes \
+-v $archives:/var/sentinel2_data/archives \
+-v $unzipped_scenes:/var/sentinel2_data/unzipped_scenes \
+-v $src:/src \
+-v $aux:$aux_container \
+-dit madmex/sen2cordocker_l2a:2.8.0 \
+/src/wrapper.sh -d $1)
+
+
+status=$(sudo docker ps -a -f id=$id_container --format "{{.Status}}"|cut -d' ' -f1)
+#linea=$(sudo docker logs $id_container|tail -n 1)
+mkdir logs_docker
+logfile=logs_docker/$(basename -s '.zip' $1).txt
+#echo $linea >> $logfile
+
+while [ "$status" == "Up" ]
+do
+status=$(sudo docker ps -a -f id=$id_container --format "{{.Status}}"|cut -d' ' -f1)
+done
+
+sudo docker logs $id_container > $logfile
+
+sudo docker rm $id_container
+```
+
+3. Execute next line to create list of jobs to launch:
+
+
+```
+for f in $(cat list_zipped.txt);do filename=$(basename -s '.zip' $f);echo "sbatch --error=logs_slurm/$filename.err --output=logs_slurm/$filename.out sen2cor_preprocess_with_docker.sh $f" >> slurm_sen2cor_launch.sh;done
+
+```
+
+4. Launch:
+
+```
+bash slurm_sen2cor_launch.sh
+```
+
+* Check logs in directory: `logs_docker`
+
+
 # Parallel downloading
 
 To speed up the download process, you can use the python script for parallel downloads, simultaneously downloading as many scenes as cores in the CPU. The python script reads the geojson file from the query, then builds the sentinelhub commands and runs them in parallel.
