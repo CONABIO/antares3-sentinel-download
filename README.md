@@ -145,12 +145,14 @@ for container in $(sudo docker service ps l2a | grep Shutdown  | tr -s ' ' | cut
 
 ## sen2cor with SLURM
 
-1. Create file `list_zipped.txt` with zip files to preprocess with sen2cor.
+**Requirement: in your nodes make sure to have docker image: madmex/sen2cordocker_l2a:2.8.0 already pulled**
+
+1. Create file `list_zipped.txt` with zip files to preprocess with sen2cor and directories: `logs_docker` and `logs_slurm` in your working directory
 
 2. Create shell `sen2cor_preprocess_with_docker.sh`:
 
 
-**Note: modify exclude and partition flags according to you**
+**Note: modify exclude and partition flags according to your specifications**
 
 ```
 #!/bin/bash
@@ -180,7 +182,6 @@ id_container=$(sudo docker run  \
 
 
 status=$(sudo docker ps -a -f id=$id_container --format "{{.Status}}"|cut -d' ' -f1)
-mkdir logs_docker
 logfile=logs_docker/$(basename -s '.zip' $1).txt
 
 while [ "$status" == "Up" ]
@@ -207,7 +208,7 @@ for f in $(cat list_zipped.txt);do filename=$(basename -s '.zip' $f);echo "sbatc
 bash slurm_sen2cor_launch.sh
 ```
 
-* Check logs in directory: `logs_docker`
+* Check logs in directory: `logs_docker` and in `logs_slurm`.
 
 
 # Parallel downloading
