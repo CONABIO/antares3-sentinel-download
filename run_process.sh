@@ -1,142 +1,76 @@
 #!/bin/bash
 
-ARG_O=0
-ARG_T=0
-ARG_D=0
+#default values
 
-show_options() {
-    # if no param is given, display a menu and then exit
-    (( $# < 1 )) && {
-        # display a menu of options
-        echo " "
-        echo "            MAIN MENU"
-        echo
-        echo "       -o                Preprocess of Sentinel-1"
-        echo "       -t                Preprocess of Sentinel-2"
-        echo "       -d  <option>      Download mode: local, sge or none"
-        echo "       -u  <user>        User"
-        echo "       -p  <psswd>       Password"
-        echo "       -g  <path/file>   Geojson file"
-        echo "       -s  <start-date>  Start date YYYYMMDD"
-        echo "       -e  <end-date>    End date YYYYMMDD"
-        echo "       -c  <max cloud>   Maximum coverage of clouds per scene [0-1]"
-        exit 1
-    }
+delete=n
+
+function usage()
+{
+		printf "\n"
+    printf "\t\t Fill nodata proccess for Landsat 7 scenes\n"
+		printf "\n"
+    printf "Usage: Some example here\n"
+    printf "\n"
+    printf "  -h --help\t\tPrints this help and exits\n"
+    printf "  -p --path\tPath to Landsat 7 scenes (default $path)\n"
+    printf "  -d --delete\tDelete original scenes (default off)\n"
+		printf "\n"
 }
 
-parse_options() {
-    while getopts :otd:u:p:g:s:e:c opt
-    do
-      case $opt in
-        o)
-          ARG_O=1
-          SATELITE="s1"
-          #echo "ARG_O is set"
-          ;;
-        t)
-          ARG_T=1
-          SATELITE="s2"
-          #echo "ARG_T is set"
-          ;;
-        d)
-          arg_d=$OPTARG
-          ARG_D=1
-          echo "arg_d is set to \"$arg_d\""
-          ;;
-        u)
-          user="$5"
-          ;;
-        p)
-          psswd="$7"
-          ;;
-        g)
-          gfile="$9"
-          ;;
-        s)
-          start="${11}"
-          ;;
-        e)
-          end="${13}"
-          ;;
-        c)
-          cloud="${15}"
-          ;;
-        ?)
-          echo "Unknow option"
-          echo "$OPTARG is not valid"
-          exit 1
-          ;;
-      esac
-    done
-}
+# Works on Linux
+getopt --test > /dev/null
+if [[ $? -ne 4 ]]; then
+    printf "I’m sorry, `getopt --test` failed in this environment.\n"
+    exit 1
+fi
 
-check_download_mode() {
-  (( $ARG_D == 1 )) && {
-        download_sentinel
-    }
-}
+OPTIONS=hp:d
+LONGOPTIONS=help,path:,delete
 
-download_sentinel() {
-    if [ $arg_d == 'local' ] || [ $arg_d == 'sge' ] ; then
-      mkdir $SATELITE"_downloads"
-    fi
-    if [ $arg_d != 1 ]; then
-      python -B download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d -c $cloud
-    else
-      python -B download_sentinel.py -u $user -p $psswd -t $SATELITE -g $gfile -s $start -e $end -d $arg_d
-    fi
+PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTIONS --name "$0" -- "$@")
 
-}
+if [[ $? -ne 0 ]]; then
+    # e.g. $? == 1
+    #  then getopt has complained about wrong arguments to stdout
+    usage
+    exit 2
+fi
 
-s1_preprocess() {
-    echo "s1 preprocess enabled"
-    # Download S1
-    check_download_mode
-    # Preproc S1
-    # Upload to s3
-}
+# read getopt’s output this way to handle the quoting right:
+eval set -- "$PARSED"
 
-s2_preprocess() {
-    echo "s2 preprocess enabled"
-    # Download S2
-    check_download_mode
-    # Preproc S1
-    # Upload to s3
-}
+# options are split until we see --
+while true; do
+    case "$1" in
+        -h|--help)
+            usage
+            exit
+            ;;
+        -p|--path)
+            path="$2"
+            shift 2
+            ;;
+        -d|--delete)
+            delete=y
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            printf "Programming error\n"
+            exit 3
+            ;;
+    esac
+done
 
-run() {
+# handle non-option arguments
+if [[ -z "$path" ]]; then
+    usage
+    printf "[ERROR] A path to scene(s) is required.\n"
+    exit 4
+fi
 
-    if [ $ARG_O == 1 ] && [ ! -z $cloud ]
-      then
-        echo "    It is not necessary to specify maximum cloudiness with Sentinel-1"
-        echo "    Input value will be ignored."
-    fi
 
-    if [ -z $cloud ];
-      then
-        cloud=${15:-1}
-    fi
-
-    if [ $ARG_O == 1 ] && [ $ARG_T == 1 ]
-      then
-        echo "Is not possible to operate both sensors at the same time"
-        exit 1
-    fi
-
-    (( $ARG_O == 1 )) && {
-      s1_preprocess
-    }
-    (( $ARG_T == 1 )) && {
-        s2_preprocess
-    }
-}
-
-main() {
-    show_options "$@"
-    parse_options "$@"
-    [ -e $SATELITE"_downloads" ] && rm -rf $SATELITE"_downloads"
-    [ -e "scenes_found.txt" ] && rm "scenes_found.txt"
-    run
-}
-
-main "$@"
+echo "Procesing scenes in" $path
