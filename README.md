@@ -147,12 +147,12 @@ for container in $(sudo docker service ps l2a | grep Shutdown  | tr -s ' ' | cut
 
 **Requirement: in your nodes make sure to have docker image: `madmex/sen2cordocker_l2a:2.8.0` already pulled**
 
-1. Create file `list_zipped.txt` with zip files to preprocess with sen2cor and directories: `logs_docker` and `logs_slurm` in your working directory
+1. Create file `list_zipped.txt` with zip files to preprocess with sen2cor and directories: `logs_docker` and `logs_slurm` in your working directory. Clone next repository: [sen2cor_docker](https://github.com/CONABIO/sen2cor_docker) in your working directory and modify bash variable `src` (in the next shell) to the path of your working directory which holds `src` from repo.
 
 2. Create shell `sen2cor_preprocess_with_docker.sh`:
 
 
-**Note: modify `exclude` and `partition` flags according to your specifications**
+**Note: modify `exclude` and `partition`, `archives`, `unzipped_scenes`, `src` flags according to your specifications**
 
 ```
 #!/bin/bash
