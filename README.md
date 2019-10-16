@@ -241,7 +241,7 @@ bash slurm_sen2cor_launch.sh
 
 * Check logs in directory: `logs_docker` and in `logs_slurm`.
 
-
+* Also use `scontrol show jobid -dd <jobid>` to get info from job
 
 
 
