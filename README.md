@@ -4,18 +4,18 @@
 
 For now, the Sentinel-2 scene download process is not integrated into the MAD-Mex system. The download process is described below using the [sentinelsat](https://github.com/sentinelsat/sentinelsat) and [sentinelhub](https://github.com/sentinel-hub/sentinelhub-py) libraries.
 
-Before starting, it is mandatory to have an account in AWS and Copernicus Open Access Hub, it is assumed that you have such libraries installed in a UNIX environment as well as the [sen2cor](http://step.esa.int/main/third-party-plugins-2/sen2cor/) tool, for more details on the installation and configuration of Sentinelat and Sentinelhub you can review the documentation [here](https://sentinelsat.readthedocs.io/en/stable/) and [here](https://sentinelhub-py.readthedocs.io/en/latest/configure.html) respectively.
+It is assumed that you have such libraries installed in a UNIX environment as well as the [sen2cor](http://step.esa.int/main/third-party-plugins-2/sen2cor/) tool, for more details on the installation and configuration of Sentinelat and Sentinelhub you can review the documentation [here](https://sentinelsat.readthedocs.io/en/stable/) and [here](https://sentinelhub-py.readthedocs.io/en/latest/configure.html) respectively.
 
-The approach we show below is to search the available scenes for a region using the Sentinelsat search engine. Here is an example of use for the region of Oaxaca, Mexico for a specific period of time. The `--footprints` flag means that you do not download the found scenes but write the results to a file called `search_footprints.geojson`.
+The approach we show below is to search the available scenes for a region using the Sentinelsat search engine. Here is an example of use for the region of Oaxaca, Mexico for a specific period of time. The `--footprints` flag means that you do not download the found scenes but write the results to a file called `search_footprints.geojson` (which will be in the path where you executed the cmd).
 
 ```bash
 sentinelsat -u <user> -p <passwd> -g oaxaca.geojson -s 20180801 -e 20180810 --producttype S2MSI1C -q "orbitdirection=Descending" --url "https://scihub.copernicus.eu/dhus" --footprints --cloud 5 --sentinel 2
 ```
+**Note the `q` flag in command above are extra search keywords for query**
 
 With the following output:
 
 ```
-I1C -q "orbitdirection=Descending" --url "https://scihub.copernicus.eu/dhus" --footprints --cloud 5 --sentinel 2
 Found 6 products
 Product 86734389-979e-4655-b081-89c07e8429e0 - Date: 2018-08-09T16:38:29.024Z, Instrument: MSI, Mode: , Satellite: Sentinel-2, Size: 749.11 MB
 Product aa8662c7-78d5-49ba-b1a2-7e86f168b844 - Date: 2018-08-09T16:38:29.024Z, Instrument: MSI, Mode: , Satellite: Sentinel-2, Size: 699.30 MB
@@ -43,6 +43,21 @@ Therefore, an alternative command line would be:
 ```bash
 sentinelsat -g oaxaca.geojson -s 20180801 -e 20180810 --producttype S2MSI1C -q "orbitdirection=Descending" --footprints --cloud 5 --sentinel 2
 ```
+
+## Using sentinelsat
+
+If you want to download, remove `footprints` flag and add `d` flag which is the one to download all files found and `path` to set the path where the files will be saved (here we delete orbitdirection keyword):
+
+```
+sentinelsat -u <user> -p <password> -g oaxaca.geojson --sentinel 2 --url https://scihub.copernicus.eu/dhus --producttype S2MSI1C -s 20180801 -e 20180810 -d --path <directory>
+```
+
+## Using jupyter notebook
+
+See: [search_and_download_s2.ipynb](https://github.com/CONABIO/antares3-sentinel-download/blob/master/search_and_download_s2.ipynb)
+
+
+## Using AWS
 
 The download now is done with Sentinelhub with its download tool from AWS. To do that, we'll use a python script to read the `search_footprints.geojson` file to get the product name. 
 
@@ -74,6 +89,22 @@ In order to process the scenes downloaded with sen2cor, we must download the ima
 sentinelhub.aws --product S2B_MSIL1C_20180805T170009_N0206_R069_T14QPE_20180805T221143 -f ~/s2_downloads
 ``` 
 The `~/s2_downloads` folder must be created previously. 
+
+## Parallel downloading
+
+To speed up the download process, you can use the python script for parallel downloads, simultaneously downloading as many scenes as cores in the CPU. The python script reads the geojson file from the query, then builds the sentinelhub commands and runs them in parallel.
+
+```bash
+python parallel_downloads.py
+```
+
+## Note
+
+
+1 .- There is a preconfigured AMI for MAD-Mex called `sentinel2_download_preproc` with all the libraries and configurations   needed to reproduce this example.
+
+2.- If what you want is to process a scene that is already in `S3`, maybe it is more convenient to copy it into the `EC2` instance. Keep in mind that when we download a scene and store it in S3, the empty folders are not copied. Therefore, to run `sen2cor` properly, folders that are lost when copying a scene in `S3` must be generated. This is to generate the folders `HTML`, `AUX_DATA` and `rep_info` inside the folder with `.SAFE` format.
+
 
 
 # Running sen2cor
@@ -209,25 +240,6 @@ bash slurm_sen2cor_launch.sh
 ```
 
 * Check logs in directory: `logs_docker` and in `logs_slurm`.
-
-
-# Parallel downloading
-
-To speed up the download process, you can use the python script for parallel downloads, simultaneously downloading as many scenes as cores in the CPU. The python script reads the geojson file from the query, then builds the sentinelhub commands and runs them in parallel.
-
-```bash
-python parallel_downloads.py
-```
-
-# Note
-
-
-1 .- There is a preconfigured AMI for MAD-Mex called `sentinel2_download_preproc` with all the libraries and configurations   needed to reproduce this example.
-
-2.- If what you want is to process a scene that is already in `S3`, maybe it is more convenient to copy it into the `EC2` instance. Keep in mind that when we download a scene and store it in S3, the empty folders are not copied. Therefore, to run `sen2cor` properly, folders that are lost when copying a scene in `S3` must be generated. This is to generate the folders `HTML`, `AUX_DATA` and `rep_info` inside the folder with `.SAFE` format.
-
-
-
 
 
 
