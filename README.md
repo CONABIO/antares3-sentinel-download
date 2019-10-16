@@ -11,7 +11,7 @@ The approach we show below is to search the available scenes for a region using 
 ```bash
 sentinelsat -u <user> -p <passwd> -g oaxaca.geojson -s 20180801 -e 20180810 --producttype S2MSI1C -q "orbitdirection=Descending" --url "https://scihub.copernicus.eu/dhus" --footprints --cloud 5 --sentinel 2
 ```
-**Note the `q` flag in command above are extra search keywords for query**
+**Note: the `q` flag in command above are extra search keywords for query**
 
 With the following output:
 
