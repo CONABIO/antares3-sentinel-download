@@ -124,7 +124,7 @@ The complete path depends on the folder of installation defined for sen2cor.
 
 ## sen2cor as docker service
 
-We can run `sen2cor.2.8.0` with dem as a docker service creating an image from [here](https://github.com/CONABIO/sen2cor_docker). The following is an example how to create two services:
+We can run `sen2cor.2.8.0` with dem as a docker service creating an image from [here](https://github.com/CONABIO/sen2cor_docker) which is persisted in [madmex/sen2cordocker_l2a](https://hub.docker.com/r/madmex/sen2cordocker_l2a/tags) dockerhub. The following is an example how to create two services:
 
 ```bash
 archives=/LUSTRE/MADMEX/tasks/2019_tasks/sen2cor_docker/data_zipped
